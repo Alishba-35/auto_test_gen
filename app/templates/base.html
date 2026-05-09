@@ -7,23 +7,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   {% block head %}{% endblock %}
 </head>
 <body>
+  <div class="particles-bg"></div>
+  <div class="gradient-overlay"></div>
+  
   <header class="site-header">
-    <a href="{{ url_for('main.index') }}" class="logo">
-      <span class="logo-bracket">[</span>
-      <span class="logo-text">AST<span class="accent">Test</span>Gen</span>
-      <span class="logo-bracket">]</span>
-    </a>
+    <div class="header-left">
+      <a href="{{ url_for('main.index') }}" class="logo">
+        <i class="logo-icon">⚡</i>
+        <span class="logo-text">AST<span class="accent">Test</span>Gen</span>
+      </a>
+    </div>
     <nav class="site-nav">
-      <span class="nav-tag">Python AST · Jinja2 · pytest · Flask</span>
+      <span class="nav-tag">
+        <i class="fas fa-code"></i> Python AST · 
+        <i class="fas fa-magic"></i> Jinja2 · 
+        <i class="fas fa-flask"></i> pytest · 
+        <i class="fas fa-rocket"></i> Flask
+      </span>
     </nav>
   </header>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}
-      <div class="flash flash--{{ category }}">⚠ {{ message }}</div>
+      <div class="flash flash--{{ category }}" role="alert">
+        <i class="flash-icon">⚠</i>
+        <span>{{ message }}</span>
+        <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+      </div>
     {% endfor %}
   {% endwith %}
 
@@ -32,7 +46,12 @@
   </main>
 
   <footer class="site-footer">
-    <span>No AI API · Zero cost · Pure AST parsing</span>
+    <div class="footer-content">
+      <span><i class="fas fa-brain"></i> No AI API · <i class="fas fa-dollar-sign text-muted">Zero cost</i> · <i class="fas fa-code-branch"></i> Pure AST parsing</span>
+      <div class="footer-stats">
+        <span>Powered by <strong>Python 3.12+</strong></span>
+      </div>
+    </div>
   </footer>
 </body>
 </html>
