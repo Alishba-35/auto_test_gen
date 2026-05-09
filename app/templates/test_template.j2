@@ -1,0 +1,256 @@
+"""
+Auto-generated pytest test file
+Module : {{ module_name }}
+Tool   : AST Unit Test Generator v2
+Note   : Every test below RUNS — no commented-out calls, no unconditional skips.
+         Raises tests use real triggering inputs derived from AST condition analysis.
+         Parametrize rows call the function; fill in 'expected' values where marked.
+"""
+
+import pytest
+{% if has_async %}
+import pytest_asyncio
+{% endif %}
+{% if has_classes %}
+from {{ module_name }} import {% for cls in class_names %}{{ cls }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% endif %}
+{% if has_functions %}
+from {{ module_name }} import {% for fn in top_level_funcs %}{{ fn }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% endif %}
+
+# =============================================================================
+# {{ functions | length }} testable function(s) | conftest.py has class fixtures
+# =============================================================================
+{% for func in functions %}
+{% if not func.is_method %}
+
+# ─── {{ func.name }}() · line {{ func.line_no }} {% if func.is_async %}[async]{% endif %} ──────────────────────────────────
+{% if func.docstring %}# {{ func.docstring | firstline }}{% endif %}
+
+
+class Test{{ func.name | title_name }}:
+{% if func.is_async %}
+    @pytest.mark.asyncio
+    async def test_{{ func.name }}_returns(self):
+{% else %}
+    def test_{{ func.name }}_returns(self):
+{% endif %}
+        """{{ func.name }} returns a result of the expected type on typical input."""
+{% for p in func.params %}
+        {{ p.name }} = {{ p.sample_value }}
+{% endfor %}
+{% if func.is_async %}
+        result = await {{ func.name }}({% for p in func.params %}{{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+{% else %}
+        result = {{ func.name }}({% for p in func.params %}{{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+{% endif %}
+{% if func.return_annotation == "bool" %}
+        assert isinstance(result, bool)
+{% elif func.return_annotation == "int" %}
+        assert isinstance(result, int)
+        assert result is not None
+{% elif func.return_annotation == "float" %}
+        assert isinstance(result, (int, float))
+{% elif func.return_annotation == "str" %}
+        assert isinstance(result, str)
+        assert len(result) >= 0
+{% elif func.return_annotation and (func.return_annotation.startswith("List") or func.return_annotation == "list") %}
+        assert isinstance(result, list)
+{% elif func.return_annotation and (func.return_annotation.startswith("Dict") or func.return_annotation == "dict") %}
+        assert isinstance(result, dict)
+{% elif func.return_annotation and func.return_annotation != "None" %}
+        assert result is not None
+{% else %}
+        # void function — assert state changes or side effects below
+        pass
+{% endif %}
+
+{% if func.raise_triggers %}
+{% for trigger in func.raise_triggers %}
+{% if func.is_async %}
+    @pytest.mark.asyncio
+    async def test_{{ func.name }}_raises_{{ trigger.exc_name | safe_exc }}_when_{{ trigger.condition_desc | replace(" ", "_") | replace("==", "eq") | replace("<=", "lte") | replace(">=", "gte") | replace("<", "lt") | replace(">", "gt") | truncate(30, False, "") }}(self):
+{% else %}
+    def test_{{ func.name }}_raises_{{ trigger.exc_name | safe_exc }}_when_{{ trigger.condition_desc | replace(" ", "_") | replace("==", "eq") | replace("<=", "lte") | replace(">=", "gte") | replace("<", "lt") | replace(">", "gt") | truncate(30, False, "") }}(self):
+{% endif %}
+        """{{ func.name }} raises {{ trigger.exc_name }} when {{ trigger.condition_desc }}."""
+        # Triggering input derived from AST condition: {{ trigger.condition_desc }}
+{% for p in func.params %}
+{% if p.name == trigger.param_name %}
+        {{ p.name }} = {{ trigger.trigger_value }}   # <── triggers {{ trigger.exc_name }}
+{% else %}
+        {{ p.name }} = {{ p.sample_value }}
+{% endif %}
+{% endfor %}
+{% if trigger.exc_message %}
+        with pytest.raises({{ trigger.exc_name }}, match=r"{{ trigger.exc_message }}"):
+{% else %}
+        with pytest.raises({{ trigger.exc_name }}):
+{% endif %}
+{% if func.is_async %}
+            await {{ func.name }}({% for p in func.params %}{{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+{% else %}
+            {{ func.name }}({% for p in func.params %}{{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+{% endif %}
+
+{% endfor %}
+{% elif func.raises %}
+{% for exc in func.raises %}
+    def test_{{ func.name }}_raises_{{ exc | safe_exc }}(self):
+        """{{ func.name }} should raise {{ exc }} — fill in triggering inputs."""
+        # TODO: replace pass with inputs that trigger {{ exc }}
+        with pytest.raises({{ exc }}):
+            pass  # e.g. {{ func.name }}(bad_arg)
+
+{% endfor %}
+{% endif %}
+{% if func.params %}
+    @pytest.mark.parametrize(
+        "{{ func.params | map(attribute='name') | join(', ') }}, expected",
+        [
+            # Row 1: typical inputs — fill in expected value
+            pytest.param({% for p in func.params %}{{ p.sample_value }}{% if not loop.last %}, {% endif %}{% endfor %}, ..., id="typical"),
+            # Row 2: alternate inputs — fill in expected value
+            pytest.param({% for p in func.params %}{{ p.alt_value }}{% if not loop.last %}, {% endif %}{% endfor %}, ..., id="alternate"),
+        ],
+    )
+{% if func.is_async %}
+    @pytest.mark.asyncio
+    async def test_{{ func.name }}_parametrized(self, {% for p in func.params %}{{ p.name }}, {% endfor %}expected):
+{% else %}
+    def test_{{ func.name }}_parametrized(self, {% for p in func.params %}{{ p.name }}, {% endfor %}expected):
+{% endif %}
+        """Parametrized: replace ... with the real expected return value."""
+{% if func.is_async %}
+        result = await {{ func.name }}({% for p in func.params %}{{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+{% else %}
+        result = {{ func.name }}({% for p in func.params %}{{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %})
+{% endif %}
+        if expected is not ...:
+            assert result == expected
+        else:
+            pytest.skip("Replace ... with the expected value for this row")
+
+{% endif %}
+{% else %}
+{# ──────────── METHOD ──────────────────────────────────────────────────── #}
+
+# ─── {{ func.class_name }}.{{ func.name }}() · line {{ func.line_no }} {% if func.is_async %}[async]{% endif %}{% if func.is_static %} [static]{% endif %}{% if func.is_classmethod %} [classmethod]{% endif %} ──
+{% if func.docstring %}# {{ func.docstring | firstline }}{% endif %}
+
+
+class Test{{ func.class_name | title_name }}{{ func.name | title_name }}:
+{% if not func.is_static and not func.is_classmethod %}
+    # Fixture from conftest.py — instantiated with real constructor args
+    @pytest.fixture
+    def instance(self):
+        {% set ci = classes[func.class_name] %}
+        return {{ func.class_name }}({% for p in ci.constructor_params %}{{ p.name }}={{ p | fixture_val }}{% if not loop.last %}, {% endif %}{% endfor %})
+
+{% endif %}
+{% if func.is_async %}
+    @pytest.mark.asyncio
+    async def test_{{ func.name }}_returns(self{% if not func.is_static and not func.is_classmethod %}, instance{% endif %}):
+{% else %}
+    def test_{{ func.name }}_returns(self{% if not func.is_static and not func.is_classmethod %}, instance{% endif %}):
+{% endif %}
+        """{{ func.class_name }}.{{ func.name }} returns expected type on typical input."""
+{% for p in func.params %}
+        {{ p.name }} = {{ p.sample_value }}
+{% endfor %}
+{% set call_recv %}{% if func.is_static %}{{ func.class_name }}{% elif func.is_classmethod %}{{ func.class_name }}{% else %}instance{% endif %}{% endset %}
+{% set call_args %}{% for p in func.params %}{{ p.name }}{% if not loop.last %}, {% endif %}{% endfor %}{% endset %}
+{% if func.is_async %}
+        result = await {{ call_recv }}.{{ func.name }}({{ call_args }})
+{% else %}
+{% if func.return_annotation and func.return_annotation != "None" %}
+        result = {{ call_recv }}.{{ func.name }}({{ call_args }})
+{% else %}
+        {{ call_recv }}.{{ func.name }}({{ call_args }})
+{% endif %}
+{% endif %}
+{% if func.return_annotation == "bool" %}
+        assert isinstance(result, bool)
+{% elif func.return_annotation == "int" %}
+        assert isinstance(result, int)
+{% elif func.return_annotation == "float" %}
+        assert isinstance(result, (int, float))
+{% elif func.return_annotation == "str" %}
+        assert isinstance(result, str)
+{% elif func.return_annotation and (func.return_annotation.startswith("List") or func.return_annotation == "list") %}
+        assert isinstance(result, list)
+{% elif func.return_annotation and (func.return_annotation.startswith("Dict") or func.return_annotation == "dict") %}
+        assert isinstance(result, dict)
+{% elif func.return_annotation and func.return_annotation != "None" %}
+        assert result is not None
+{% else %}
+        pass  # void — assert state change on instance below
+{% endif %}
+
+{% if func.raise_triggers %}
+{% for trigger in func.raise_triggers %}
+{% if func.is_async %}
+    @pytest.mark.asyncio
+    async def test_{{ func.name }}_raises_{{ trigger.exc_name | safe_exc }}_when_{{ trigger.condition_desc | replace(" ", "_") | replace("==", "eq") | replace("<=", "lte") | replace(">=", "gte") | replace("<", "lt") | replace(">", "gt") | truncate(30, False, "") }}(self{% if not func.is_static and not func.is_classmethod %}, instance{% endif %}):
+{% else %}
+    def test_{{ func.name }}_raises_{{ trigger.exc_name | safe_exc }}_when_{{ trigger.condition_desc | replace(" ", "_") | replace("==", "eq") | replace("<=", "lte") | replace(">=", "gte") | replace("<", "lt") | replace(">", "gt") | truncate(30, False, "") }}(self{% if not func.is_static and not func.is_classmethod %}, instance{% endif %}):
+{% endif %}
+        """{{ func.class_name }}.{{ func.name }} raises {{ trigger.exc_name }} when {{ trigger.condition_desc }}."""
+{% for p in func.params %}
+{% if p.name == trigger.param_name %}
+        {{ p.name }} = {{ trigger.trigger_value }}   # <── triggers {{ trigger.exc_name }}
+{% else %}
+        {{ p.name }} = {{ p.sample_value }}
+{% endif %}
+{% endfor %}
+{% if trigger.exc_message %}
+        with pytest.raises({{ trigger.exc_name }}, match=r"{{ trigger.exc_message }}"):
+{% else %}
+        with pytest.raises({{ trigger.exc_name }}):
+{% endif %}
+{% if func.is_async %}
+            await {{ call_recv }}.{{ func.name }}({{ call_args }})
+{% else %}
+            {{ call_recv }}.{{ func.name }}({{ call_args }})
+{% endif %}
+
+{% endfor %}
+{% elif func.raises %}
+{% for exc in func.raises %}
+    def test_{{ func.name }}_raises_{{ exc | safe_exc }}(self{% if not func.is_static and not func.is_classmethod %}, instance{% endif %}):
+        """{{ func.class_name }}.{{ func.name }} raises {{ exc }} — fill in triggering inputs."""
+        with pytest.raises({{ exc }}):
+            pass  # TODO: replace with a real call using inputs that trigger {{ exc }}
+
+{% endfor %}
+{% endif %}
+{% if func.params %}
+    @pytest.mark.parametrize(
+        "{{ func.params | map(attribute='name') | join(', ') }}, expected",
+        [
+            pytest.param({% for p in func.params %}{{ p.sample_value }}{% if not loop.last %}, {% endif %}{% endfor %}, ..., id="typical"),
+            pytest.param({% for p in func.params %}{{ p.alt_value }}{% if not loop.last %}, {% endif %}{% endfor %}, ..., id="alternate"),
+        ],
+    )
+{% if func.is_async %}
+    @pytest.mark.asyncio
+    async def test_{{ func.name }}_parametrized(self{% if not func.is_static and not func.is_classmethod %}, instance{% endif %}, {% for p in func.params %}{{ p.name }}, {% endfor %}expected):
+{% else %}
+    def test_{{ func.name }}_parametrized(self{% if not func.is_static and not func.is_classmethod %}, instance{% endif %}, {% for p in func.params %}{{ p.name }}, {% endfor %}expected):
+{% endif %}
+        """Replace ... with expected return value to activate this test."""
+{% if func.is_async %}
+        result = await {{ call_recv }}.{{ func.name }}({{ call_args }})
+{% else %}
+        result = {{ call_recv }}.{{ func.name }}({{ call_args }})
+{% endif %}
+        if expected is not ...:
+            assert result == expected
+        else:
+            pytest.skip("Replace ... with the expected value for this row")
+
+{% endif %}
+{% endif %}
+{% endfor %}

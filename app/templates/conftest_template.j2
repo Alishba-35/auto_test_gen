@@ -1,0 +1,38 @@
+"""
+conftest.py — Shared pytest fixtures (auto-generated)
+Module: {{ module_name }}
+
+Each class gets a module-scoped fixture with correct constructor arguments.
+Import path: pytest discovers this automatically when placed alongside test file.
+"""
+
+import pytest
+{% if has_classes %}
+from {{ module_name }} import {% for cls in class_names %}{{ cls }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+{% endif %}
+
+# =============================================================================
+# Class fixtures — constructor args derived from __init__ type hints
+# =============================================================================
+{% for cls_name in class_names %}
+{% set ci = classes[cls_name] %}
+
+@pytest.fixture
+def {{ cls_name | lower }}_instance():
+    """
+    Fresh {{ cls_name }} for each test.
+    Constructor: {{ cls_name }}({% for p in ci.constructor_params %}{{ p.name }}{% if p.annotation %}: {{ p.annotation }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %})
+    """
+    return {{ cls_name }}({% for p in ci.constructor_params %}{{ p.name }}={{ p | fixture_val }}{% if not loop.last %}, {% endif %}{% endfor %})
+
+
+@pytest.fixture
+def {{ cls_name | lower }}_instance_alt():
+    """
+    Alternate {{ cls_name }} instance with different constructor values.
+    Useful for comparison / equality tests.
+    """
+    return {{ cls_name }}({% for p in ci.constructor_params %}{{ p.name }}={{ p.alt_value }}{% if not loop.last %}, {% endif %}{% endfor %})
+
+{% endfor %}

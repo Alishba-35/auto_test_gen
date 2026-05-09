@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Generated — test_{{ module_name }}.py{% endblock %}
+
+{% block head %}
+<style>
+  .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  @media(max-width:900px){ .result-grid { grid-template-columns:1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Top bar ─────────────────────────────────────────────────────────── -->
+<div class="result-topbar">
+  <div class="result-meta">
+    <span class="badge badge--green">✓ Generated</span>
+    <span class="result-filename">test_{{ module_name }}.py</span>
+    <span class="result-from">← {{ original_filename }}</span>
+  </div>
+  <div class="result-actions">
+    <a href="{{ url_for('main.download', filename=out_filename) }}" class="btn-download">
+      ↓ Download test file
+    </a>
+    <button class="btn-copy" onclick="copyTests()">⎘ Copy</button>
+    <a href="{{ url_for('main.index') }}" class="btn-new">+ New file</a>
+  </div>
+</div>
+
+<!-- ── Stats row ──────────────────────────────────────────────────────── -->
+<div class="stats-row">
+  <div class="stat-card">
+    <span class="stat-val">{{ stats.total_functions }}</span>
+    <span class="stat-label">Functions found</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-val">{{ stats.top_level }}</span>
+    <span class="stat-label">Top-level</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-val">{{ stats.methods }}</span>
+    <span class="stat-label">Methods</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-val">{{ stats.classes }}</span>
+    <span class="stat-label">Classes</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-val">{{ stats.with_type_hints }}</span>
+    <span class="stat-label">With type hints</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-val">{{ stats.with_raises }}</span>
+    <span class="stat-label">Raises detected</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-val">{{ stats.async_functions }}</span>
+    <span class="stat-label">Async fns</span>
+  </div>
+</div>
+
+<!-- ── Function table ─────────────────────────────────────────────────── -->
+{% if functions %}
+<div class="func-table-wrap">
+  <h2 class="section-title">Detected functions</h2>
+  <table class="func-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Function</th><th>Class</th><th>Params</th>
+        <th>Return</th><th>Raises</th><th>Async</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for fn in functions %}
+      <tr>
+        <td class="muted">{{ loop.index }}</td>
+        <td><code>{{ fn.name }}</code></td>
+        <td>{% if fn.class_name %}<code>{{ fn.class_name }}</code>{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td>
+          {% if fn.params %}
+            {% for p in fn.params %}
+              <span class="param-tag">{{ p.name }}{% if p.annotation %}:<span class="type-hint">{{ p.annotation }}</span>{% endif %}</span>
+            {% endfor %}
+          {% else %}
+            <span class="muted">none</span>
+          {% endif %}
+        </td>
+        <td>{% if fn.return_annotation %}<code class="type-hint">{{ fn.return_annotation }}</code>{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td>
+          {% if fn.raises %}
+            {% for r in fn.raises %}<span class="exc-tag">{{ r }}</span>{% endfor %}
+          {% else %}
+            <span class="muted">—</span>
+          {% endif %}
+        </td>
+        <td>{% if fn.is_async %}<span class="badge badge--blue">async</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- ── Code panes ──────────────────────────────────────────────────────── -->
+<div class="result-grid">
+  <!-- Source -->
+  <div class="code-pane">
+    <div class="code-pane-header">
+      <span>📄 {{ original_filename }}</span>
+      <span class="muted">source</span>
+    </div>
+    <pre class="code-block"><code>{{ source_code }}</code></pre>
+  </div>
+
+  <!-- Generated tests -->
+  <div class="code-pane">
+    <div class="code-pane-header">
+      <span>🧪 test_{{ module_name }}.py</span>
+      <span class="muted">generated</span>
+    </div>
+    <pre class="code-block" id="testCode"><code>{{ test_code }}</code></pre>
+  </div>
+</div>
+
+<!-- ── Tip box ─────────────────────────────────────────────────────────── -->
+<div class="tip-box">
+  <h3>📌 Next steps</h3>
+  <ol>
+    <li>Place <code>test_{{ module_name }}.py</code> in the same directory as <code>{{ original_filename }}</code>.</li>
+    <li>Fill in the <code># TODO</code> assertions — the scaffolding is already done.</li>
+    <li>Run <code>pytest test_{{ module_name }}.py -v</code></li>
+    <li>Uncomment parametrize rows with real input→output pairs for thorough coverage.</li>
+  </ol>
+</div>
+
+<script>
+function copyTests() {
+  const code = document.getElementById('testCode').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = '⎘ Copy', 2000);
+  });
+}
+</script>
+{% endblock %}

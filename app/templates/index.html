@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}AST Test Generator — Upload{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-badge">v1.0 · Free &amp; Open</div>
+  <h1 class="hero-title">
+    Automated<br/>
+    <span class="accent">Unit Test</span><br/>
+    Generator
+  </h1>
+  <p class="hero-sub">
+    Upload any Python file → get a full pytest suite in seconds.<br/>
+    Powered by Python's built-in <code>ast</code> module. No AI. No cost.
+  </p>
+</section>
+
+<section class="features-row">
+  <div class="feature-pill">⚡ AST Parsing</div>
+  <div class="feature-pill">🧪 pytest output</div>
+  <div class="feature-pill">📋 Type-hint aware</div>
+  <div class="feature-pill">🔁 Parametrized stubs</div>
+  <div class="feature-pill">🏷 Raises detection</div>
+</section>
+
+<section class="upload-section">
+  <form action="{{ url_for('main.generate') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-icon">{ .py }</div>
+      <p class="drop-label">Drag &amp; drop your Python file here</p>
+      <p class="drop-sub">or click to browse</p>
+      <input type="file" name="python_file" id="fileInput" accept=".py" required />
+      <div class="file-chosen" id="fileChosen" style="display:none;">
+        <span class="file-icon">📄</span>
+        <span id="chosenName"></span>
+      </div>
+    </div>
+
+    <div class="upload-options">
+      <div class="option-info">
+        <span class="option-dot"></span>
+        Supports top-level functions, class methods, static methods, classmethods &amp; async functions
+      </div>
+    </div>
+
+    <button type="submit" class="btn-generate" id="generateBtn">
+      <span class="btn-text">Generate Tests →</span>
+      <span class="btn-loading" style="display:none;">Parsing AST…</span>
+    </button>
+  </form>
+</section>
+
+<section class="how-it-works">
+  <h2 class="section-title">How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <span class="step-num">01</span>
+      <h3>Upload</h3>
+      <p>Drop your <code>.py</code> file. Max 2 MB.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <h3>Parse</h3>
+      <p>AST walks every function, extracts params, return types, docstrings &amp; raises.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <h3>Generate</h3>
+      <p>Jinja2 renders a complete pytest file with basic, edge &amp; parametrized stubs.</p>
+    </div>
+    <div class="step-arrow">→</div>
+    <div class="step">
+      <span class="step-num">04</span>
+      <h3>Download</h3>
+      <p>Copy or download <code>test_yourfile.py</code> and fill in the TODOs.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+const dropZone  = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const fileChosen = document.getElementById('fileChosen');
+const chosenName = document.getElementById('chosenName');
+const form      = document.getElementById('uploadForm');
+const genBtn    = document.getElementById('generateBtn');
+
+dropZone.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length) showFile(fileInput.files[0].name);
+});
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.endsWith('.py')) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+    showFile(file.name);
+  }
+});
+
+function showFile(name) {
+  fileChosen.style.display = 'flex';
+  chosenName.textContent = name;
+}
+
+form.addEventListener('submit', () => {
+  genBtn.querySelector('.btn-text').style.display = 'none';
+  genBtn.querySelector('.btn-loading').style.display = 'inline';
+  genBtn.disabled = true;
+});
+</script>
+{% endblock %}

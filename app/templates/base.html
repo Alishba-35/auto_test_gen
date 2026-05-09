@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}AST Test Generator{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <a href="{{ url_for('main.index') }}" class="logo">
+      <span class="logo-bracket">[</span>
+      <span class="logo-text">AST<span class="accent">Test</span>Gen</span>
+      <span class="logo-bracket">]</span>
+    </a>
+    <nav class="site-nav">
+      <span class="nav-tag">Python AST · Jinja2 · pytest · Flask</span>
+    </nav>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash flash--{{ category }}">⚠ {{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <span>No AI API · Zero cost · Pure AST parsing</span>
+  </footer>
+</body>
+</html>
