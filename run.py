@@ -1,6 +1,3 @@
-"""
-run.py — Entry point for the Auto Unit Test Generator
-"""
 
 from app import create_app
 

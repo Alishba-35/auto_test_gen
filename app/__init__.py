@@ -12,11 +12,14 @@ def create_app() -> Flask:
         template_folder="templates",
         static_folder="../static",
     )
-    app.config["SECRET_KEY"] = "ast-test-gen-dev-key-2024"
-    app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2 MB cap
 
-    # Ensure upload / output dirs exist
-    base = os.path.dirname(os.path.dirname(__file__))
+    app.config["SECRET_KEY"] = "ast-test-gen-dev-key-2024"
+    app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024
+
+    # Vercel allows temporary writes in /tmp.
+    # Do not try to create folders inside the deployed project.
+    base = "/tmp/auto_test_gen"
+
     app.config["UPLOAD_FOLDER"] = os.path.join(base, "uploads")
     app.config["GENERATED_FOLDER"] = os.path.join(base, "generated")
 
