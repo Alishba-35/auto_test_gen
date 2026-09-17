@@ -1,252 +1,305 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>auto-gen-test</title>
 
-{% block title %}AST Test Generator — Upload Python File{% endblock %}
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/static/style.css">
 
-{% block content %}
-<!-- Hero with Stats -->
-<section class="hero">
-  <div class="hero-stats">
-    <div class="stat-bubble">
-      <div class="stat-number">10K+</div>
-      <div class="stat-label">Tests Generated</div>
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- Ambient background layers -->
+  <div class="particles-bg"></div>
+  <div class="gradient-overlay"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-left">
+      <a href="/" class="logo">
+        <span class="logo-icon">🧪</span>
+        <span class="logo-text">ASTTestGen</span>
+      </a>
     </div>
-    <div class="stat-bubble">
-      <div class="stat-number">0s</div>
-      <div class="stat-label">AI Latency</div>
-    </div>
-    <div class="stat-bubble">
-      <div class="stat-number">🚀</div>
-      <div class="stat-label">Instant</div>
-    </div>
-  </div>
-  
-  <div class="hero-badge">
-    <i class="fas fa-crown"></i>
-    <span class="badge-glow">v1.0 Pro</span>
-    <span>Free Forever</span>
-  </div>
-  
-  <h1 class="hero-title">
-    <span class="title-glow">Automated</span><br/>
-    <span class="accent title-glow">Unit Test</span><br/>
-    <span class="title-glow">Generator</span>
-  </h1>
-  
-  <p class="hero-sub">
-    <i class="fas fa-file-code"></i> Upload any Python file → 
-    <strong>Get complete pytest suite instantly</strong><br/>
-    <i class="fas fa-brain-slash"></i> Powered by Python's <code>ast</code> module. 
-    <strong>No AI. No cost. No limits.</strong>
-  </p>
-  
-  <div class="hero-cta">
-    <p class="hero-trust">
-      <i class="fas fa-check-circle"></i> 
-      100% accurate type hints · 
-      <i class="fas fa-check-circle"></i> 
-      Async support · 
-      <i class="fas fa-check-circle"></i> 
-      Class methods
-    </p>
-  </div>
-</section>
+    <nav class="site-nav">
+      <span class="nav-tag"><i class="fas fa-bolt"></i> v1.0 Pro</span>
+    </nav>
+    <button class="theme-toggle" id="themeToggle">
+      <span class="icon">🌙</span> Theme
+    </button>
+  </header>
 
-<!-- Enhanced Features -->
-<section class="features-grid">
-  <div class="feature-card">
-    <div class="feature-icon">⚡</div>
-    <h3>Lightning Fast</h3>
-    <p>AST parsing in milliseconds</p>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">🧪</div>
-    <h3>pytest Ready</h3>
-    <p>Production-ready test files</p>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">📋</div>
-    <h3>Type Aware</h3>
-    <p>Full type annotation support</p>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">🔁</div>
-    <h3>Parametrized</h3>
-    <p>Edge case templates included</p>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">🏷</div>
-    <h3>Exception Aware</h3>
-    <p>Detects raises automatically</p>
-  </div>
-  <div class="feature-card">
-    <div class="feature-icon">🎯</div>
-    <h3>Zero Config</h3>
-    <p>Works out of the box</p>
-  </div>
-</section>
+  <main class="main-content">
 
-<!-- Super Upload Zone -->
-<section class="upload-section">
-  <div class="upload-card">
-    <form action="{{ url_for('main.generate') }}" method="post" enctype="multipart/form-data" id="uploadForm">
-      <div class="drop-zone premium" id="dropZone">
-        <div class="drop-content">
-          <div class="drop-icon-large">{ <span class="accent">.py</span> }</div>
-          <div class="drop-text">
-            <p class="drop-label"><i class="fas fa-mouse-pointer"></i> Drag & drop your Python file here</p>
-            <p class="drop-sub"><i class="fas fa-folder-open"></i> or click to browse</p>
-          </div>
+    <!-- Hero with Stats -->
+    <section class="hero">
+      <div class="hero-stats">
+        <div class="stat-bubble">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Tests Generated</div>
         </div>
-        <input type="file" name="python_file" id="fileInput" accept=".py" required />
-        
-        <div class="file-chosen" id="fileChosen" style="display:none;">
-          <div class="file-preview">
-            <i class="fas fa-file-code file-icon"></i>
-            <div class="file-info">
-              <span id="chosenName" class="file-name"></span>
-              <span class="file-status"><i class="fas fa-check-circle"></i> Ready to generate</span>
+        <div class="stat-bubble">
+          <div class="stat-number">0s</div>
+          <div class="stat-label">AI Latency</div>
+        </div>
+        <div class="stat-bubble">
+          <div class="stat-number">🚀</div>
+          <div class="stat-label">Instant</div>
+        </div>
+      </div>
+
+      <div class="hero-badge">
+        <i class="fas fa-crown"></i>
+        <span class="badge-glow">v1.0 Pro</span>
+        <span>Free Forever</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="title-glow">Automated</span>
+        <span class="accent title-glow">Unit Test</span>
+        <span class="title-glow">Generator</span>
+      </h1>
+
+      <p class="hero-sub">
+        <i class="fas fa-file-code"></i> Upload any Python file →
+        <strong>Get complete pytest suite instantly</strong><br/>
+        <i class="fas fa-microchip"></i> Powered by Python's <code>ast</code> module.
+        <strong>No AI. No cost. No limits.</strong>
+      </p>
+
+      <div class="hero-cta">
+        <p class="hero-trust">
+          <span><i class="fas fa-check-circle"></i> 100% accurate type hints</span>
+          <span><i class="fas fa-check-circle"></i> Async support</span>
+          <span><i class="fas fa-check-circle"></i> Class methods</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- Enhanced Features -->
+    <section class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Lightning Fast</h3>
+        <p>AST parsing in milliseconds</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧪</div>
+        <h3>pytest Ready</h3>
+        <p>Production-ready test files</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Type Aware</h3>
+        <p>Full type annotation support</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔁</div>
+        <h3>Parametrized</h3>
+        <p>Edge case templates included</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏷</div>
+        <h3>Exception Aware</h3>
+        <p>Detects raises automatically</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Zero Config</h3>
+        <p>Works out of the box</p>
+      </div>
+    </section>
+
+    <!-- Upload Zone -->
+    <section class="upload-section">
+      <div class="upload-card">
+        <form action="{{ url_for('main.generate') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+          <div class="drop-zone" id="dropZone">
+            <div class="drop-content">
+              <div class="drop-icon-large">{ <span class="accent">.py</span> }</div>
+              <div class="drop-text">
+                <p class="drop-label"><i class="fas fa-mouse-pointer"></i> Drag & drop your Python file here</p>
+                <p class="drop-sub"><i class="fas fa-folder-open"></i> or click to browse</p>
+              </div>
+            </div>
+            <input type="file" name="python_file" id="fileInput" accept=".py" required />
+
+            <div class="file-chosen" id="fileChosen" style="display:none;">
+              <div class="file-preview">
+                <i class="fas fa-file-code file-icon"></i>
+                <div class="file-info">
+                  <span id="chosenName" class="file-name"></span>
+                  <span class="file-status"><i class="fas fa-check-circle"></i> Ready to generate</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="drop-progress" id="dropProgress" style="display:none;">
+              <div class="progress-bar">
+                <div class="progress-fill"></div>
+              </div>
+              <span class="progress-text">Processing...</span>
             </div>
           </div>
-        </div>
-        
-        <div class="drop-progress" id="dropProgress" style="display:none;">
-          <div class="progress-bar">
-            <div class="progress-fill"></div>
+
+          <div class="upload-features">
+            <div class="feature-bullet">
+              <i class="fas fa-check"></i>
+              <span>Top-level functions, class methods, static methods, classmethods &amp; async functions</span>
+            </div>
+            <div class="feature-bullet">
+              <i class="fas fa-check"></i>
+              <span>Max file size: <strong>5MB</strong> | No account required</span>
+            </div>
           </div>
-          <span class="progress-text">Processing...</span>
+
+          <button type="submit" class="btn-generate" id="generateBtn">
+            <span class="btn-icon"><i class="fas fa-magic"></i></span>
+            <span class="btn-text">Generate Tests Instantly →</span>
+            <span class="btn-loading" style="display:none;">
+              <i class="fas fa-spinner fa-spin"></i> Parsing AST...
+            </span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+      <h2 class="section-title">
+        <i class="fas fa-rocket"></i> How it works in 4 clicks
+      </h2>
+      <div class="steps enhanced">
+        <div class="step enhanced-step">
+          <div class="step-number">01</div>
+          <i class="step-icon fas fa-cloud-upload-alt"></i>
+          <h3>Upload</h3>
+          <p>Drop your <code>.py</code> file</p>
+        </div>
+        <div class="step-arrow fancy">→</div>
+        <div class="step enhanced-step">
+          <div class="step-number">02</div>
+          <i class="step-icon fas fa-search"></i>
+          <h3>Parse</h3>
+          <p>AST extracts everything automatically</p>
+        </div>
+        <div class="step-arrow fancy">→</div>
+        <div class="step enhanced-step">
+          <div class="step-number">03</div>
+          <i class="step-icon fas fa-hammer"></i>
+          <h3>Generate</h3>
+          <p>Complete pytest suite rendered</p>
+        </div>
+        <div class="step-arrow fancy">→</div>
+        <div class="step enhanced-step">
+          <div class="step-number">04</div>
+          <i class="step-icon fas fa-download"></i>
+          <h3>Download</h3>
+          <p>Copy or download <code>test_file.py</code></p>
         </div>
       </div>
+    </section>
 
-      <div class="upload-features">
-        <div class="feature-bullet">
-          <i class="fas fa-check"></i>
-          <span>✅ Top-level functions, class methods, static methods, classmethods & async functions</span>
-        </div>
-        <div class="feature-bullet">
-          <i class="fas fa-check"></i>
-          <span>✅ Max file size: <strong>5MB</strong> | No account required</span>
-        </div>
-      </div>
+  </main>
 
-      <button type="submit" class="btn-generate premium-btn" id="generateBtn">
-        <span class="btn-icon"><i class="fas fa-magic"></i></span>
-        <span class="btn-text">Generate Tests Instantly →</span>
-        <span class="btn-loading" style="display:none;">
-          <i class="fas fa-spinner fa-spin"></i> Parsing AST...
-        </span>
-      </button>
-    </form>
-  </div>
-</section>
-
-<!-- Enhanced How It Works -->
-<section class="how-it-works">
-  <h2 class="section-title">
-    <i class="fas fa-rocket"></i> How it works in 4 clicks
-  </h2>
-  <div class="steps enhanced">
-    <div class="step enhanced-step">
-      <div class="step-number">01</div>
-      <i class="step-icon fas fa-cloud-upload-alt"></i>
-      <h3>Upload</h3>
-      <p>Drop your <code>.py</code> file</p>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <span class="muted">Built with ❤ using Python's <code>ast</code> module</span>
+      <span class="footer-stats">No tracking · No accounts · 100% free</span>
     </div>
-    <div class="step-arrow fancy">→</div>
-    <div class="step enhanced-step">
-      <div class="step-number">02</div>
-      <i class="step-icon fas fa-search"></i>
-      <h3>Parse</h3>
-      <p>AST extracts everything automatically</p>
-    </div>
-    <div class="step-arrow fancy">→</div>
-    <div class="step enhanced-step">
-      <div class="step-number">03</div>
-      <i class="step-icon fas fa-hammer"></i>
-      <h3>Generate</h3>
-      <p>Complete pytest suite rendered</p>
-    </div>
-    <div class="step-arrow fancy">→</div>
-    <div class="step enhanced-step">
-      <div class="step-number">04</div>
-      <i class="step-icon fas fa-download"></i>
-      <h3>Download</h3>
-      <p>Copy or download <code>test_file.py</code></p>
-    </div>
-  </div>
-</section>
+  </footer>
 
-<script>
-// Enhanced drag & drop with progress
-const dropZone  = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const fileChosen = document.getElementById('fileChosen');
-const chosenName = document.getElementById('chosenName');
-const form      = document.getElementById('uploadForm');
-const genBtn    = document.getElementById('generateBtn');
-const dropProgress = document.getElementById('dropProgress');
+  <script>
+    // Theme toggle (persisted)
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
 
-dropZone.addEventListener('click', () => fileInput.click());
+    themeToggle.addEventListener('click', () => {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
 
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length) {
-    showFile(e.target.files[0].name);
-    // File size check
-    const file = e.target.files[0];
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File too large! Max 5MB.');
-      e.target.value = '';
-      return;
+    // Drag & drop with progress
+    const dropZone     = document.getElementById('dropZone');
+    const fileInput    = document.getElementById('fileInput');
+    const fileChosen   = document.getElementById('fileChosen');
+    const chosenName   = document.getElementById('chosenName');
+    const form         = document.getElementById('uploadForm');
+    const genBtn       = document.getElementById('generateBtn');
+    const dropProgress = document.getElementById('dropProgress');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        const file = e.target.files[0];
+        if (file.size > 5 * 1024 * 1024) {
+          showToast('File too large! Max 5MB.', 'error');
+          e.target.value = '';
+          return;
+        }
+        showFile(file.name);
+      }
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('drag-over');
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.name.endsWith('.py')) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        showFile(file.name);
+      } else {
+        showToast('Please drop a .py file only!', 'error');
+      }
+    });
+
+    function showFile(name) {
+      fileChosen.style.display = 'flex';
+      chosenName.textContent = name;
+      dropZone.classList.add('file-selected');
     }
-  }
-});
 
-dropZone.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropZone.classList.add('drag-over', 'premium-drag');
-});
-dropZone.addEventListener('dragleave', () => {
-  dropZone.classList.remove('drag-over', 'premium-drag');
-});
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over', 'premium-drag');
-  const file = e.dataTransfer.files[0];
-  if (file && file.name.endsWith('.py')) {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    fileInput.files = dt.files;
-    showFile(file.name);
-  } else {
-    showToast('Please drop a .py file only!', 'error');
-  }
-});
+    form.addEventListener('submit', () => {
+      genBtn.disabled = true;
+      genBtn.querySelector('.btn-text').style.display = 'none';
+      genBtn.querySelector('.btn-loading').style.display = 'flex';
+      dropProgress.style.display = 'block';
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 90) progress = 90;
+        document.querySelector('.progress-fill').style.width = progress + '%';
+      }, 200);
+    });
 
-function showFile(name) {
-  fileChosen.style.display = 'flex';
-  chosenName.textContent = name;
-  dropZone.classList.add('file-selected');
-}
-
-form.addEventListener('submit', () => {
-  genBtn.disabled = true;
-  genBtn.querySelector('.btn-text').style.display = 'none';
-  genBtn.querySelector('.btn-loading').style.display = 'flex';
-  dropProgress.style.display = 'block';
-  // Fake progress animation
-  let progress = 0;
-  const interval = setInterval(() => {
-    progress += Math.random() * 15;
-    if (progress > 90) progress = 90;
-    document.querySelector('.progress-fill').style.width = progress + '%';
-  }, 200);
-});
-
-function showToast(message, type = 'success') {
-  const toast = document.createElement('div');
-  toast.className = `toast toast--${type}`;
-  toast.innerHTML = `<i class="toast-icon"></i><span>${message}</span>`;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
-}
-</script>
-{% endblock %}
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast--${type}`;
+      toast.innerHTML = `<span>${message}</span>`;
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
