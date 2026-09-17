@@ -40,6 +40,13 @@
   --shadow-base: 0 8px 30px rgba(23, 26, 36, 0.08);
   --shadow-glow: 0 12px 40px rgba(79, 109, 245, 0.16);
 
+  /* Wash applied over background.png so cards/text stay readable */
+  --bg-overlay: linear-gradient(
+    160deg,
+    rgba(246, 247, 251, 0.9) 0%,
+    rgba(238, 241, 248, 0.9) 100%
+  );
+
   --font-display: "Outfit", "Plus Jakarta Sans", sans-serif;
   --font-body: "Plus Jakarta Sans", sans-serif;
   --mono: "JetBrains Mono", "Courier New", monospace;
@@ -78,6 +85,12 @@
 
   --shadow-base: 0 8px 30px rgba(0, 0, 0, 0.35);
   --shadow-glow: 0 12px 45px rgba(124, 147, 255, 0.22);
+
+  --bg-overlay: linear-gradient(
+    160deg,
+    rgba(15, 17, 23, 0.88) 0%,
+    rgba(20, 22, 31, 0.88) 100%
+  );
 }
 
 /* Respect system preference if no explicit choice has been made yet */
@@ -104,6 +117,11 @@
     --border-glow: rgba(124, 147, 255, 0.3);
     --shadow-base: 0 8px 30px rgba(0, 0, 0, 0.35);
     --shadow-glow: 0 12px 45px rgba(124, 147, 255, 0.22);
+    --bg-overlay: linear-gradient(
+      160deg,
+      rgba(15, 17, 23, 0.88) 0%,
+      rgba(20, 22, 31, 0.88) 100%
+    );
   }
 }
 
@@ -147,7 +165,7 @@ h4 {
   font-family: var(--font-display);
 }
 
-/* Soft ambient glow blobs, theme-aware */
+/* Soft ambient glow blobs + background image, theme-aware */
 .particles-bg {
   position: fixed;
   inset: 0;
@@ -170,7 +188,11 @@ h4 {
       rgba(20, 184, 166, 0.09) 0%,
       transparent 45%
     ),
+    var(--bg-overlay),
+    url("/static/background.png") center / cover no-repeat fixed,
     var(--bg-secondary);
+  background-blend-mode:
+    normal, normal, normal, normal, overlay, normal, normal;
   transition: background var(--t-slow);
 }
 

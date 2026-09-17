@@ -1,468 +1,320 @@
-{% extends "base.html" %} {% block title %}Generated — {{ test_filename }}{%
-endblock %} {% block head %}
-<style>
-  /* ── PERFECT BUTTONS (Already Fixed) ── */
-  .result-actions {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    padding: 1rem 0;
-  }
-  .btn-download,
-  .btn-copy,
-  .btn-new,
-  .btn-download.secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.9rem 1.8rem;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    border: 2px solid;
-    backdrop-filter: blur(20px);
-    min-height: 48px;
-  }
-  .btn-download {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white !important;
-    border-color: #10b981;
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
-    padding: 1rem 2.2rem;
-    font-size: 15px;
-  }
-  .btn-download:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5);
-  }
-  .btn-download.secondary {
-    background: linear-gradient(135deg, #6b7280, #4b5563);
-    color: white !important;
-    border-color: #6b7280;
-    padding: 0.9rem 1.6rem;
-  }
-  .btn-copy {
-    background: transparent;
-    color: var(--neon-cyan) !important;
-    border-color: var(--neon-cyan);
-  }
-  .btn-copy:hover {
-    background: rgba(0, 212, 177, 0.1);
-    box-shadow: 0 0 20px rgba(0, 212, 177, 0.3);
-  }
-  .btn-copy.copied {
-    background: linear-gradient(135deg, #10b981, #059669) !important;
-    color: white !important;
-    border-color: #10b981 !important;
-    animation: pulse 0.5s;
-  }
-  .btn-new {
-    background: transparent;
-    color: var(--text-secondary) !important;
-    border-color: var(--text-muted);
-  }
-  .btn-new:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary) !important;
-    border-color: var(--text-secondary);
-  }
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  /* ── PERFECT TABLE ── */
-  .table-container {
-    background: var(--glass-1);
-    border: 1px solid rgba(0, 212, 177, 0.2);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-top: 1rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  }
-  .func-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .func-table th {
-    background: var(--glass-2);
-    text-align: left;
-    padding: 1rem 1.2rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    color: var(--text-secondary);
-    border-bottom: 1px solid rgba(0, 212, 177, 0.1);
-    font-size: 11px;
-    text-transform: uppercase;
-  }
-  .func-table td {
-    padding: 1rem 1.2rem;
-    border-bottom: 1px solid rgba(0, 212, 177, 0.05);
-    vertical-align: top;
-  }
-  .func-table tr:hover td {
-    background: rgba(0, 212, 177, 0.06);
-  }
-  .params {
-    min-width: 200px;
-  }
-  .param-tag {
-    display: inline-block;
-    background: rgba(0, 212, 177, 0.12);
-    border: 1px solid rgba(0, 212, 177, 0.3);
-    border-radius: 6px;
-    padding: 0.3rem 0.8rem;
-    margin: 0.2rem 0.2rem 0.2rem 0;
-    font-size: 12px;
-    color: var(--text-primary);
-  }
-  .type-hint {
-    color: var(--neon-purple) !important;
-    font-weight: 600;
-  }
-  .exc-tag {
-    background: rgba(220, 53, 69, 0.15) !important;
-    border-color: rgba(220, 53, 69, 0.3) !important;
-    color: #dc3545 !important;
-    margin-right: 0.5rem;
-  }
+    <title>Generated Tests - Auto Test Generator</title>
 
-  /* ── PERFECT CODE PANES ── */
-  .result-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-  }
-  .code-pane {
-    background: var(--glass-1);
-    border: 1px solid rgba(0, 212, 177, 0.2);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    max-height: 550px;
-    transition: all 0.3s ease;
-  }
-  .code-pane:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  }
-  .code-pane-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 1.5rem;
-    background: var(--glass-2);
-    border-bottom: 1px solid rgba(0, 212, 177, 0.1);
-  }
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .header-left.accent i {
-    color: var(--neon-cyan);
-    filter: drop-shadow(0 0 8px currentColor);
-  }
-  .code-block {
-    overflow: auto;
-    padding: 2rem;
-    font-size: 13px;
-    line-height: 1.7;
-    color: #d1d5db;
-    max-height: 550px;
-    font-family: var(--mono);
-  }
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='favicon.png') }}"
+    />
 
-  /* ── Stats & Quick Start ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    margin: 2.5rem 0;
-  }
-  .stat-card {
-    background: var(--glass-2);
-    border: 1px solid rgba(0, 212, 177, 0.15);
-    border-radius: var(--radius);
-    padding: 1.5rem 1rem;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
-  .stat-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--neon-cyan);
-  }
-  .stat-val {
-    font-family: var(--display);
-    font-size: 2rem;
-    font-weight: 800;
-    display: block;
-  }
-  .stat-card.accent .stat-val,
-  .stat-card.teal .stat-val {
-    background: linear-gradient(var(--neon-cyan), var(--neon-teal));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .stat-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-    margin-top: 0.5rem;
-  }
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
 
-  .quick-start {
-    background: var(--glass-2);
-    border: 1px solid rgba(0, 212, 177, 0.2);
-    border-left: 4px solid var(--neon-cyan);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    margin-top: 2.5rem;
-  }
-  .quick-title {
-    font-family: var(--display);
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .quick-steps ol {
-    padding-left: 1.5rem;
-  }
-  .quick-steps li {
-    color: var(--text-secondary);
-    margin-bottom: 0.75rem;
-    font-size: 14px;
-  }
-  .quick-steps code {
-    font-size: 13px;
-  }
+    <!-- Your CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
 
-  /* Responsive */
-  @media (max-width: 900px) {
-    .result-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-    .result-actions {
-      justify-content: center;
-      gap: 0.75rem;
-    }
-    .btn-download {
-      padding: 1rem 1.8rem;
-      font-size: 14px;
-    }
-  }
-  @keyframes pulse {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.05);
-    }
-  }
-</style>
-{% endblock %} {% block content %}
+  <body>
+    <!-- Result Header -->
+    <div class="result-hero">
+      <div class="result-topbar">
+        <div class="success-badge">
+          <i class="fas fa-check-circle"></i> Generated Successfully
+        </div>
 
-<!-- Header with PERFECT Buttons -->
-<div class="result-hero">
-  <div class="result-topbar">
-    <div class="result-meta">
-      <span class="badge badge--success large">
-        <i class="fas fa-check-circle"></i> Generated Successfully
-      </span>
-      <div>
-        <span class="result-filename accent">{{ test_filename }}</span>
-        <span class="result-from muted">← {{ original_filename }}</span>
+        <div class="result-info">
+          <span class="result-filename">{{ test_filename }}</span>
+          <span class="muted">← {{ original_filename }}</span>
+        </div>
+
+        <div class="result-actions">
+          <a
+            href="{{ url_for('main.download', filename=test_filename) }}"
+            class="btn-download premium"
+            download
+          >
+            <i class="fas fa-download"></i> Download Tests
+          </a>
+
+          {% if conftest_filename %}
+          <a
+            href="{{ url_for('main.download', filename=conftest_filename) }}"
+            class="btn-new premium"
+          >
+            <i class="fas fa-cogs"></i> Conftest
+          </a>
+          {% endif %}
+
+          <button class="btn-copy premium" onclick="copyTests()" id="copyBtn">
+            <i class="fas fa-copy"></i> Copy Tests
+          </button>
+
+          <a href="{{ url_for('main.index') }}" class="btn-new premium">
+            <i class="fas fa-plus-circle"></i> New File
+          </a>
+        </div>
       </div>
     </div>
-    <div class="result-actions">
-      <a
-        href="{{ url_for('main.download', filename=test_filename) }}"
-        class="btn-download"
-        download
-      >
-        <i class="fas fa-download"></i> <strong>Download Tests</strong>
-      </a>
-      {% if conftest_filename %}
-      <a
-        href="{{ url_for('main.download', filename=conftest_filename) }}"
-        class="btn-download secondary"
-      >
-        <i class="fas fa-cogs"></i> Conftest
-      </a>
-      {% endif %}
-      <button class="btn-copy" onclick="copyTests()">
-        <i class="fas fa-copy"></i> Copy Tests
-      </button>
-      <a href="{{ url_for('main.index') }}" class="btn-new">
-        <i class="fas fa-plus-circle"></i> New File
-      </a>
-    </div>
-  </div>
-</div>
 
-<!-- PERFECT Stats Grid -->
-<div class="stats-grid">
-  <div class="stat-card">
-    <span class="stat-val accent">{{ stats.total_functions }}</span>
-    <span class="stat-label">Functions</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-val">{{ stats.top_level }}</span>
-    <span class="stat-label">Top Level</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-val">{{ stats.methods }}</span>
-    <span class="stat-label">Methods</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-val">{{ stats.classes }}</span>
-    <span class="stat-label">Classes</span>
-  </div>
-  <div class="stat-card accent">
-    <span class="stat-val">{{ stats.with_type_hints }}</span>
-    <span class="stat-label">Type Hints</span>
-  </div>
-  <div class="stat-card">
-    <span class="stat-val">{{ stats.with_raises }}</span>
-    <span class="stat-label">Raises</span>
-  </div>
-  <div class="stat-card teal">
-    <span class="stat-val">{{ stats.async_functions }}</span>
-    <span class="stat-label">Async</span>
-  </div>
-</div>
-
-<!-- PERFECT Functions Table -->
-{% if functions %}
-<div class="section-wrapper">
-  <h2 class="section-title">
-    📋 Detected Functions ({{ stats.total_functions }})
-  </h2>
-  <div class="table-container">
-    <table class="func-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Function</th>
-          <th>Class</th>
-          <th>Params</th>
-          <th>Return</th>
-          <th>Raises</th>
-          <th>Async</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for fn in functions %}
-        <tr>
-          <td class="muted">{{ loop.index }}</td>
-          <td><code class="accent">{{ fn.name }}</code></td>
-          <td>
-            {% if fn.class_name %}<code>{{ fn.class_name }}</code>{% else
-            %}<span class="muted">—</span>{% endif %}
-          </td>
-          <td class="params">
-            {% if fn.params %} {% for p in fn.params %}
-            <span class="param-tag">
-              {{ p.name }}{% if p.annotation %}:<span class="type-hint"
-                >{{ p.annotation }}</span
-              >{% endif %}
-            </span>
-            {% endfor %} {% else %}
-            <span class="muted">none</span>
-            {% endif %}
-          </td>
-          <td>
-            {% if fn.return_annotation %}<code class="type-hint"
-              >{{ fn.return_annotation }}</code
-            >{% else %}<span class="muted">—</span>{% endif %}
-          </td>
-          <td>
-            {% if fn.raises %} {% for r in fn.raises %}
-            <span class="exc-tag">{{ r }}</span>
-            {% endfor %} {% else %}
-            <span class="muted">—</span>
-            {% endif %}
-          </td>
-          <td>
-            {% if fn.is_async %}<span class="badge badge--teal">⚡ async</span
-            >{% else %}<span class="muted">—</span>{% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-{% endif %}
-
-<!-- PERFECT Code Comparison -->
-<div class="result-grid">
-  <!-- Source -->
-  <div class="code-pane">
-    <div class="code-pane-header">
-      <div class="header-left">
-        <i class="fas fa-file-code"></i>
-        <span>{{ original_filename }}</span>
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card premium accent">
+        <span class="stat-val">{{ stats.total_functions }}</span>
+        <span class="stat-label">Functions</span>
       </div>
-      <div class="header-right muted">source code</div>
-    </div>
-    <pre class="code-block"><code>{{ source_code }}</code></pre>
-  </div>
 
-  <!-- Tests -->
-  <div class="code-pane">
-    <div class="code-pane-header accent">
-      <div class="header-left">
-        <i class="fas fa-vial"></i>
-        <span>{{ test_filename }}</span>
+      <div class="stat-card premium">
+        <span class="stat-val">{{ stats.top_level }}</span>
+        <span class="stat-label">Top Level</span>
       </div>
-      <div class="header-right">generated tests ✓</div>
+
+      <div class="stat-card premium">
+        <span class="stat-val">{{ stats.methods }}</span>
+        <span class="stat-label">Methods</span>
+      </div>
+
+      <div class="stat-card premium">
+        <span class="stat-val">{{ stats.classes }}</span>
+        <span class="stat-label">Classes</span>
+      </div>
+
+      <div class="stat-card premium accent">
+        <span class="stat-val">{{ stats.with_type_hints }}</span>
+        <span class="stat-label">Type Hints</span>
+      </div>
+
+      <div class="stat-card premium danger">
+        <span class="stat-val">{{ stats.with_raises }}</span>
+        <span class="stat-label">Raises</span>
+      </div>
+
+      <div class="stat-card premium blue">
+        <span class="stat-val">{{ stats.async_functions }}</span>
+        <span class="stat-label">Async</span>
+      </div>
     </div>
-    <pre class="code-block" id="testCode"><code>{{ test_code }}</code></pre>
-  </div>
-</div>
 
-<!-- PERFECT Quick Start -->
-<div class="quick-start">
-  <h3 class="quick-title">
-    <i class="fas fa-rocket"></i> Run Tests in 3 Steps
-  </h3>
-  <div class="quick-steps">
-    <ol>
-      <li>Save <code>{{ test_filename }}</code> next to your Python file</li>
-      <li>Fill the <code># TODO</code> assertions (structure ready!)</li>
-      <li>Run <code class="terminal">pytest {{ test_filename }} -v</code></li>
-    </ol>
-  </div>
-</div>
+    <!-- Functions Table -->
+    {% if functions %}
 
-<script>
-  function copyTests() {
-    const code = document.getElementById("testCode").innerText;
-    const btn = event.target.closest(".btn-copy");
-    const originalHTML = btn.innerHTML;
+    <div class="section-wrapper">
+      <h2 class="section-title">
+        <i class="fas fa-list-check"></i>
+        Detected Functions ({{ stats.total_functions }})
+      </h2>
 
-    navigator.clipboard
-      .writeText(code)
-      .then(() => {
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        btn.classList.add("copied");
-        setTimeout(() => {
-          btn.innerHTML = originalHTML;
-          btn.classList.remove("copied");
-        }, 2500);
-      })
-      .catch(() => {
-        btn.innerHTML = '<i class="fas fa-exclamation"></i> Failed';
-        setTimeout(() => {
-          btn.innerHTML = originalHTML;
-        }, 2000);
-      });
-  }
-</script>
+      <div class="table-container premium">
+        <table class="func-table premium-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Function</th>
+              <th>Class</th>
+              <th>Params</th>
+              <th>Return</th>
+              <th>Raises</th>
+              <th>Async</th>
+            </tr>
+          </thead>
 
-{% endblock %}
+          <tbody>
+            {% for fn in functions %}
+
+            <tr class="{{ 'async-row' if fn.is_async else '' }}">
+              <td class="muted">{{ loop.index }}</td>
+
+              <td>
+                <code class="fn-name"> {{ fn.name }} </code>
+              </td>
+
+              <td>
+                {% if fn.class_name %}
+                <code class="class-name"> {{ fn.class_name }} </code>
+                {% else %}
+                <span class="muted">—</span>
+                {% endif %}
+              </td>
+
+              <td class="params-cell">
+                {% if fn.params %} {% for p in fn.params %}
+
+                <span class="param-tag premium">
+                  {{ p.name }} {% if p.annotation %} :<span
+                    class="type-hint premium"
+                  >
+                    {{ p.annotation }}
+                  </span>
+                  {% endif %}
+                </span>
+
+                {% endfor %} {% else %}
+
+                <span class="muted">none</span>
+
+                {% endif %}
+              </td>
+
+              <td>
+                {% if fn.return_annotation %}
+
+                <code class="type-hint premium return-type">
+                  {{ fn.return_annotation }}
+                </code>
+
+                {% else %}
+
+                <span class="muted">—</span>
+
+                {% endif %}
+              </td>
+
+              <td class="raises-cell">
+                {% if fn.raises %} {% for r in fn.raises %}
+
+                <span class="exc-tag premium badge premium"> {{ r }} </span>
+
+                {% endfor %} {% else %}
+
+                <span class="muted">—</span>
+
+                {% endif %}
+              </td>
+
+              <td>
+                {% if fn.is_async %}
+
+                <span class="badge premium async-badge"> ⚡ async </span>
+
+                {% else %}
+
+                <span class="muted">—</span>
+
+                {% endif %}
+              </td>
+            </tr>
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% endif %}
+
+    <!-- Code Comparison -->
+    <div class="code-comparison">
+      <!-- Source -->
+      <div class="code-pane premium source-pane">
+        <div class="code-pane-header">
+          <div class="header-left">
+            <i class="fas fa-file-code"></i>
+            <span>{{ original_filename }}</span>
+          </div>
+
+          <div class="muted">source code</div>
+        </div>
+
+        <pre class="code-block premium"><code>{{ source_code }}</code></pre>
+      </div>
+
+      <!-- Tests -->
+      <div class="code-pane premium tests-pane">
+        <div class="code-pane-header">
+          <div class="header-left accent">
+            <i class="fas fa-vial"></i>
+            <span>{{ test_filename }}</span>
+          </div>
+
+          <div class="accent">generated tests ✓</div>
+        </div>
+
+        <pre
+          class="code-block premium"
+          id="testCode"
+        ><code>{{ test_code }}</code></pre>
+      </div>
+    </div>
+
+    <!-- Quick Start -->
+    <div class="quick-start">
+      <h3 class="quick-title">
+        <i class="fas fa-rocket"></i>
+        Run Tests in 3 Steps
+      </h3>
+
+      <div class="quick-steps">
+        <div class="quick-step">
+          <span class="step-number">1</span>
+          <p>
+            Save
+            <code class="terminal">{{ test_filename }}</code>
+            next to your Python file
+          </p>
+        </div>
+
+        <div class="quick-step">
+          <span class="step-number">2</span>
+          <p>
+            Fill the
+            <code class="terminal"># TODO</code>
+            assertions (structure ready!)
+          </p>
+        </div>
+
+        <div class="quick-step">
+          <span class="step-number">3</span>
+          <p>
+            Run
+            <code class="terminal"> pytest {{ test_filename }} -v </code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Copy Tests Script -->
+    <script>
+      function copyTests() {
+        const code = document.getElementById("testCode").innerText;
+
+        const btn = document.getElementById("copyBtn");
+
+        const originalHTML = btn.innerHTML;
+
+        navigator.clipboard
+          .writeText(code)
+
+          .then(() => {
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+
+            btn.classList.add("success");
+
+            setTimeout(() => {
+              btn.innerHTML = originalHTML;
+
+              btn.classList.remove("success");
+            }, 2500);
+          })
+
+          .catch(() => {
+            btn.innerHTML = '<i class="fas fa-exclamation"></i> Failed';
+
+            setTimeout(() => {
+              btn.innerHTML = originalHTML;
+            }, 2000);
+          });
+      }
+    </script>
+  </body>
+</html>
