@@ -189,7 +189,7 @@ h4 {
       transparent 45%
     ),
     var(--bg-overlay),
-    url("/static/background.png") center / cover no-repeat fixed,
+    url("/static/background.jpg") center / cover no-repeat fixed,
     var(--bg-secondary);
   background-blend-mode:
     normal, normal, normal, normal, overlay, normal, normal;

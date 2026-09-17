@@ -7,309 +7,347 @@
     <title>Generated Tests - Auto Test Generator</title>
 
     <!-- Favicon -->
-    <link
-      rel="icon"
-      type="image/png"
-      href="{{ url_for('static', filename='favicon.png') }}"
-    />
-
-    <!-- Font Awesome -->
+    <link rel="icon" type="image/png" href="/static/icon.jpg" />
+    <link rel="apple-touch-icon" href="/static/icon.jpg" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     />
 
     <!-- Your CSS -->
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
 
   <body>
-    <!-- Result Header -->
-    <div class="result-hero">
-      <div class="result-topbar">
-        <div class="success-badge">
-          <i class="fas fa-check-circle"></i> Generated Successfully
+    <!-- Ambient background layers -->
+    <div class="particles-bg"></div>
+    <div class="bg-image" id="bgImage"></div>
+    <div class="gradient-overlay"></div>
+
+    <!-- Header -->
+    <header class="site-header">
+      <div class="header-left">
+        <a href="/" class="logo">
+          <span class="logo-icon">🧪</span>
+          <span class="logo-text">ASTTestGen</span>
+        </a>
+      </div>
+      <nav class="site-nav">
+        <span class="nav-tag"><i class="fas fa-bolt"></i> v1.0 Pro</span>
+      </nav>
+      <button class="theme-toggle" id="themeToggle">
+        <span class="icon">🌙</span> Theme
+      </button>
+    </header>
+
+    <main class="main-content">
+      <!-- Result Header -->
+      <div class="result-hero">
+        <div class="result-topbar">
+          <div class="success-badge">
+            <i class="fas fa-check-circle"></i> Generated Successfully
+          </div>
+
+          <div class="result-info">
+            <span class="result-filename">{{ test_filename }}</span>
+            <span class="muted">← {{ original_filename }}</span>
+          </div>
+
+          <div class="result-actions">
+            <a
+              href="{{ url_for('main.download', filename=test_filename) }}"
+              class="btn-download premium"
+              download
+            >
+              <i class="fas fa-download"></i> Download Tests
+            </a>
+
+            {% if conftest_filename %}
+            <a
+              href="{{ url_for('main.download', filename=conftest_filename) }}"
+              class="btn-new premium"
+            >
+              <i class="fas fa-cogs"></i> Conftest
+            </a>
+            {% endif %}
+
+            <button class="btn-copy premium" onclick="copyTests()" id="copyBtn">
+              <i class="fas fa-copy"></i> Copy Tests
+            </button>
+
+            <a href="{{ url_for('main.index') }}" class="btn-new premium">
+              <i class="fas fa-plus-circle"></i> New File
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card premium accent">
+          <span class="stat-val">{{ stats.total_functions }}</span>
+          <span class="stat-label">Functions</span>
         </div>
 
-        <div class="result-info">
-          <span class="result-filename">{{ test_filename }}</span>
-          <span class="muted">← {{ original_filename }}</span>
+        <div class="stat-card premium">
+          <span class="stat-val">{{ stats.top_level }}</span>
+          <span class="stat-label">Top Level</span>
         </div>
 
-        <div class="result-actions">
-          <a
-            href="{{ url_for('main.download', filename=test_filename) }}"
-            class="btn-download premium"
-            download
-          >
-            <i class="fas fa-download"></i> Download Tests
-          </a>
+        <div class="stat-card premium">
+          <span class="stat-val">{{ stats.methods }}</span>
+          <span class="stat-label">Methods</span>
+        </div>
 
-          {% if conftest_filename %}
-          <a
-            href="{{ url_for('main.download', filename=conftest_filename) }}"
-            class="btn-new premium"
-          >
-            <i class="fas fa-cogs"></i> Conftest
-          </a>
-          {% endif %}
+        <div class="stat-card premium">
+          <span class="stat-val">{{ stats.classes }}</span>
+          <span class="stat-label">Classes</span>
+        </div>
 
-          <button class="btn-copy premium" onclick="copyTests()" id="copyBtn">
-            <i class="fas fa-copy"></i> Copy Tests
-          </button>
+        <div class="stat-card premium accent">
+          <span class="stat-val">{{ stats.with_type_hints }}</span>
+          <span class="stat-label">Type Hints</span>
+        </div>
 
-          <a href="{{ url_for('main.index') }}" class="btn-new premium">
-            <i class="fas fa-plus-circle"></i> New File
-          </a>
+        <div class="stat-card premium danger">
+          <span class="stat-val">{{ stats.with_raises }}</span>
+          <span class="stat-label">Raises</span>
+        </div>
+
+        <div class="stat-card premium blue">
+          <span class="stat-val">{{ stats.async_functions }}</span>
+          <span class="stat-label">Async</span>
         </div>
       </div>
-    </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <div class="stat-card premium accent">
-        <span class="stat-val">{{ stats.total_functions }}</span>
-        <span class="stat-label">Functions</span>
-      </div>
+      <!-- Functions Table -->
+      {% if functions %}
 
-      <div class="stat-card premium">
-        <span class="stat-val">{{ stats.top_level }}</span>
-        <span class="stat-label">Top Level</span>
-      </div>
+      <div class="section-wrapper">
+        <h2 class="section-title">
+          <i class="fas fa-list-check"></i>
+          Detected Functions ({{ stats.total_functions }})
+        </h2>
 
-      <div class="stat-card premium">
-        <span class="stat-val">{{ stats.methods }}</span>
-        <span class="stat-label">Methods</span>
-      </div>
+        <div class="table-container premium">
+          <table class="func-table premium-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Function</th>
+                <th>Class</th>
+                <th>Params</th>
+                <th>Return</th>
+                <th>Raises</th>
+                <th>Async</th>
+              </tr>
+            </thead>
 
-      <div class="stat-card premium">
-        <span class="stat-val">{{ stats.classes }}</span>
-        <span class="stat-label">Classes</span>
-      </div>
+            <tbody>
+              {% for fn in functions %}
 
-      <div class="stat-card premium accent">
-        <span class="stat-val">{{ stats.with_type_hints }}</span>
-        <span class="stat-label">Type Hints</span>
-      </div>
+              <tr class="{{ 'async-row' if fn.is_async else '' }}">
+                <td class="muted">{{ loop.index }}</td>
 
-      <div class="stat-card premium danger">
-        <span class="stat-val">{{ stats.with_raises }}</span>
-        <span class="stat-label">Raises</span>
-      </div>
+                <td>
+                  <code class="fn-name"> {{ fn.name }} </code>
+                </td>
 
-      <div class="stat-card premium blue">
-        <span class="stat-val">{{ stats.async_functions }}</span>
-        <span class="stat-label">Async</span>
-      </div>
-    </div>
-
-    <!-- Functions Table -->
-    {% if functions %}
-
-    <div class="section-wrapper">
-      <h2 class="section-title">
-        <i class="fas fa-list-check"></i>
-        Detected Functions ({{ stats.total_functions }})
-      </h2>
-
-      <div class="table-container premium">
-        <table class="func-table premium-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Function</th>
-              <th>Class</th>
-              <th>Params</th>
-              <th>Return</th>
-              <th>Raises</th>
-              <th>Async</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {% for fn in functions %}
-
-            <tr class="{{ 'async-row' if fn.is_async else '' }}">
-              <td class="muted">{{ loop.index }}</td>
-
-              <td>
-                <code class="fn-name"> {{ fn.name }} </code>
-              </td>
-
-              <td>
-                {% if fn.class_name %}
-                <code class="class-name"> {{ fn.class_name }} </code>
-                {% else %}
-                <span class="muted">—</span>
-                {% endif %}
-              </td>
-
-              <td class="params-cell">
-                {% if fn.params %} {% for p in fn.params %}
-
-                <span class="param-tag premium">
-                  {{ p.name }} {% if p.annotation %} :<span
-                    class="type-hint premium"
-                  >
-                    {{ p.annotation }}
-                  </span>
+                <td>
+                  {% if fn.class_name %}
+                  <code class="class-name"> {{ fn.class_name }} </code>
+                  {% else %}
+                  <span class="muted">—</span>
                   {% endif %}
-                </span>
+                </td>
 
-                {% endfor %} {% else %}
+                <td class="params-cell">
+                  {% if fn.params %} {% for p in fn.params %}
 
-                <span class="muted">none</span>
+                  <span class="param-tag premium">
+                    {{ p.name }} {% if p.annotation %} :<span
+                      class="type-hint premium"
+                    >
+                      {{ p.annotation }}
+                    </span>
+                    {% endif %}
+                  </span>
 
-                {% endif %}
-              </td>
+                  {% endfor %} {% else %}
 
-              <td>
-                {% if fn.return_annotation %}
+                  <span class="muted">none</span>
 
-                <code class="type-hint premium return-type">
-                  {{ fn.return_annotation }}
-                </code>
+                  {% endif %}
+                </td>
 
-                {% else %}
+                <td>
+                  {% if fn.return_annotation %}
 
-                <span class="muted">—</span>
+                  <code class="type-hint premium return-type">
+                    {{ fn.return_annotation }}
+                  </code>
 
-                {% endif %}
-              </td>
+                  {% else %}
 
-              <td class="raises-cell">
-                {% if fn.raises %} {% for r in fn.raises %}
+                  <span class="muted">—</span>
 
-                <span class="exc-tag premium badge premium"> {{ r }} </span>
+                  {% endif %}
+                </td>
 
-                {% endfor %} {% else %}
+                <td class="raises-cell">
+                  {% if fn.raises %} {% for r in fn.raises %}
 
-                <span class="muted">—</span>
+                  <span class="exc-tag premium badge premium"> {{ r }} </span>
 
-                {% endif %}
-              </td>
+                  {% endfor %} {% else %}
 
-              <td>
-                {% if fn.is_async %}
+                  <span class="muted">—</span>
 
-                <span class="badge premium async-badge"> ⚡ async </span>
+                  {% endif %}
+                </td>
 
-                {% else %}
+                <td>
+                  {% if fn.is_async %}
 
-                <span class="muted">—</span>
+                  <span class="badge premium async-badge"> ⚡ async </span>
 
-                {% endif %}
-              </td>
-            </tr>
+                  {% else %}
 
-            {% endfor %}
-          </tbody>
-        </table>
+                  <span class="muted">—</span>
+
+                  {% endif %}
+                </td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-    {% endif %}
+      {% endif %}
 
-    <!-- Code Comparison -->
-    <div class="code-comparison">
-      <!-- Source -->
-      <div class="code-pane premium source-pane">
-        <div class="code-pane-header">
-          <div class="header-left">
-            <i class="fas fa-file-code"></i>
-            <span>{{ original_filename }}</span>
+      <!-- Code Comparison -->
+      <div class="code-comparison">
+        <!-- Source -->
+        <div class="code-pane premium source-pane">
+          <div class="code-pane-header">
+            <div class="header-left">
+              <i class="fas fa-file-code"></i>
+              <span>{{ original_filename }}</span>
+            </div>
+
+            <div class="muted">source code</div>
           </div>
 
-          <div class="muted">source code</div>
+          <pre class="code-block premium"><code>{{ source_code }}</code></pre>
         </div>
 
-        <pre class="code-block premium"><code>{{ source_code }}</code></pre>
-      </div>
+        <!-- Tests -->
+        <div class="code-pane premium tests-pane">
+          <div class="code-pane-header">
+            <div class="header-left accent">
+              <i class="fas fa-vial"></i>
+              <span>{{ test_filename }}</span>
+            </div>
 
-      <!-- Tests -->
-      <div class="code-pane premium tests-pane">
-        <div class="code-pane-header">
-          <div class="header-left accent">
-            <i class="fas fa-vial"></i>
-            <span>{{ test_filename }}</span>
+            <div class="accent">generated tests ✓</div>
           </div>
 
-          <div class="accent">generated tests ✓</div>
-        </div>
-
-        <pre
-          class="code-block premium"
-          id="testCode"
-        ><code>{{ test_code }}</code></pre>
-      </div>
-    </div>
-
-    <!-- Quick Start -->
-    <div class="quick-start">
-      <h3 class="quick-title">
-        <i class="fas fa-rocket"></i>
-        Run Tests in 3 Steps
-      </h3>
-
-      <div class="quick-steps">
-        <div class="quick-step">
-          <span class="step-number">1</span>
-          <p>
-            Save
-            <code class="terminal">{{ test_filename }}</code>
-            next to your Python file
-          </p>
-        </div>
-
-        <div class="quick-step">
-          <span class="step-number">2</span>
-          <p>
-            Fill the
-            <code class="terminal"># TODO</code>
-            assertions (structure ready!)
-          </p>
-        </div>
-
-        <div class="quick-step">
-          <span class="step-number">3</span>
-          <p>
-            Run
-            <code class="terminal"> pytest {{ test_filename }} -v </code>
-          </p>
+          <pre
+            class="code-block premium"
+            id="testCode"
+          ><code>{{ test_code }}</code></pre>
         </div>
       </div>
-    </div>
 
-    <!-- Copy Tests Script -->
+      <!-- Quick Start -->
+      <div class="quick-start">
+        <h3 class="quick-title">
+          <i class="fas fa-rocket"></i>
+          Run Tests in 3 Steps
+        </h3>
+
+        <div class="quick-steps">
+          <div class="quick-step">
+            <span class="step-number">1</span>
+            <p>
+              Save
+              <code class="terminal">{{ test_filename }}</code>
+              next to your Python file
+            </p>
+          </div>
+
+          <div class="quick-step">
+            <span class="step-number">2</span>
+            <p>
+              Fill the
+              <code class="terminal"># TODO</code>
+              assertions (structure ready!)
+            </p>
+          </div>
+
+          <div class="quick-step">
+            <span class="step-number">3</span>
+            <p>
+              Run
+              <code class="terminal"> pytest {{ test_filename }} -v </code>
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-content">
+        <span class="muted"
+          >Built with ❤ using Python's <code>ast</code> module</span
+        >
+        <span class="footer-stats">No tracking · No accounts · 100% free</span>
+      </div>
+    </footer>
+
     <script>
+      // Load the heavy background image off the critical path.
+      (function () {
+        const bgEl = document.getElementById("bgImage");
+        const img = new Image();
+        img.onload = () => bgEl.classList.add("loaded");
+        img.src = "/static/background.png";
+      })();
+
+      // Theme toggle (persisted)
+      const themeToggle = document.getElementById("themeToggle");
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme)
+        document.documentElement.setAttribute("data-theme", savedTheme);
+
+      themeToggle.addEventListener("click", () => {
+        const html = document.documentElement;
+        const next =
+          html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        html.setAttribute("data-theme", next);
+        localStorage.setItem("theme", next);
+      });
+
+      // Copy Tests
       function copyTests() {
         const code = document.getElementById("testCode").innerText;
-
         const btn = document.getElementById("copyBtn");
-
         const originalHTML = btn.innerHTML;
 
         navigator.clipboard
           .writeText(code)
-
           .then(() => {
             btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-
             btn.classList.add("success");
-
             setTimeout(() => {
               btn.innerHTML = originalHTML;
-
               btn.classList.remove("success");
             }, 2500);
           })
-
           .catch(() => {
             btn.innerHTML = '<i class="fas fa-exclamation"></i> Failed';
-
             setTimeout(() => {
               btn.innerHTML = originalHTML;
             }, 2000);
